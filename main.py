@@ -13,6 +13,7 @@ import pyttsx3
 import pyaudio
 import threading
 import speech_recognition as sr
+from PyQt5.QtCore import QSettings
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -33,6 +34,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.start_button = QtWidgets.QPushButton("Старт")
         self.start_button.clicked.connect(self.start_speech)
         layout.addWidget(self.start_button)
+        label = QtWidgets.QLabel("Голосовые команды - Файл, Документ, Таблица, Презентация, Выключить, Перезагрузить, Камера, Калькулятор, Клавиатура, Браузер, Блокнот, Скриншот, Папка, VS")
+        layout.addWidget(label)
+
+        
+
 
         open_button = QtWidgets.QPushButton("Открыть файл")
         word_button = QtWidgets.QPushButton("Открыть Microsoft Word")
@@ -46,7 +52,9 @@ class MainWindow(QtWidgets.QMainWindow):
         browser_button = QtWidgets.QPushButton("Открыть браузер")
         notepad_button = QtWidgets.QPushButton("Открыть блокнот")
         screenshot_button = QtWidgets.QPushButton("Сделать скриншот")
-        
+        explorer_button = QtWidgets.QPushButton("Открыть папку с файлами")
+        settings_button = QtWidgets.QPushButton("Панель управления")
+        vscode_button = QtWidgets.QPushButton("Открыть VS Code")
 
         open_button.clicked.connect(self.open_fileonnewwindow)
         word_button.clicked.connect(self.open_word)
@@ -60,8 +68,11 @@ class MainWindow(QtWidgets.QMainWindow):
         browser_button.clicked.connect(self.open_browser)
         notepad_button.clicked.connect(self.open_notepad)
         screenshot_button.clicked.connect(self.open_screenshot)
+        explorer_button.clicked.connect(self.explorer)
+        settings_button.clicked.connect(self.settings)
+        vscode_button.clicked.connect(self.vscode)
 
-
+        layout.addWidget(settings_button)
         layout.addWidget(open_button)
         layout.addWidget(word_button)
         layout.addWidget(excel_button)
@@ -74,6 +85,8 @@ class MainWindow(QtWidgets.QMainWindow):
         layout.addWidget(browser_button)
         layout.addWidget(notepad_button)
         layout.addWidget(screenshot_button)
+        layout.addWidget(explorer_button)
+        layout.addWidget(vscode_button)
 
         self.microphone = sr.Microphone()
         self.recognizer = sr.Recognizer()
@@ -81,14 +94,17 @@ class MainWindow(QtWidgets.QMainWindow):
                          "документ": self.open_word,
                          "таблица": self.open_Excel,
                          "презентация": self.open_PowerPoint,
-                         "выключить компьютер": self.shutdown,
-                         "перезагрузить компьютер": self.restart,
+                         "выключить": self.shutdown,
+                         "перезагрузить": self.restart,
                          "камера": self.camera,
                          "калькулятор": self.calculator,
                          "клавиатура": self.keyboard,
                          "браузер": self.open_browser,
                          "блокнот": self.open_notepad,
-                         "скриншот": self.open_screenshot}
+                         "скриншот": self.open_screenshot,
+                         "папка": self.explorer,
+                         "панель": self.settings,
+                         "vs": self.vscode}
         self.setCentralWidget(central_widget)
            
     def start_speech(self):
@@ -121,8 +137,13 @@ class MainWindow(QtWidgets.QMainWindow):
             url = QUrl.fromLocalFile(filePath)
             QDesktopServices.openUrl(url)
 
-
+    def settings(self):
+        subprocess.Popen(["control"])
         
+    def explorer(self):
+        directory = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Directory')
+        QDesktopServices.openUrl(QUrl.fromLocalFile(directory))
+
     def open_word(self):
         QDesktopServices.openUrl(QUrl.fromLocalFile("C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE"))
 
@@ -150,7 +171,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def open_screenshot(self):
         directory = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Directory')
         pyscreenshot.grab().save(directory + "/screenshot.png")
-
+    def vscode(self):
+        os.system("code")
     
 
 if __name__ == '__main__':
